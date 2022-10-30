@@ -11,16 +11,18 @@ worker.onmessage = (data) => {
     m3 = new Int32Array(data.data.matrizBuffer3);
     linesToWork = data.data.workerLines;
 
-    startWorkerWork();
+    startWorkerWork().then(() => {
+        worker.postMessage(true);
+    }); //Após finalizado o processamento, ele notifica o main thread
 }
 
-const startWorkerWork = () => {
-    linesToWork.forEach((line) => {
-        multiplyLinePerM2Column(line);
+const startWorkerWork = async () => {
+    linesToWork.forEach(async (line) => {
+        await multiplyLinePerM2Column(line);
     });
 }
 
-const multiplyLinePerM2Column = (line) => {
+const multiplyLinePerM2Column = async(line) => {
     //Inqüestinável
     let lineToMultiply  = new Int32Array(m1.buffer, line*10000*4, 10000);
     let acumulator = 0;
